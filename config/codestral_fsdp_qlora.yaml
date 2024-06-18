@@ -1,0 +1,47 @@
+
+### training related
+dataset_path: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/data"
+output_dir: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/checkpoints" # prexisting folder path
+sm_save_model_dir: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/model/"  # prexisting folder path
+logging_dir: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/checkpoints/logs"
+
+model_id: "mistral-community/Codestral-22B-v0.1"
+num_train_epochs: 1
+max_steps: -1   # mumber of training steps (overrides num_train_epochs)
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+gradient_accumulation_steps: 1
+gradient_checkpointing: true
+gradient_checkpointing_kwargs: 
+    use_reentrant: false
+bf16: true
+tf32: true
+max_grad_norm: 0.3
+weight_decay: 0.001
+optim: "adamw_torch"
+learning_rate: 0.0002
+warmup_ratio: 0.03
+lr_scheduler_type: "constant"
+save_strategy: "no"
+logging_steps: 25
+logging_strategy: "steps"
+group_by_length: true
+max_seq_length: 4096
+packing: false
+finetune_with_sm: false
+merge_weights_and_save: true
+save_tokenizer: true
+attn_implementation: "sdpa"
+
+### qlora related
+lora_r: 64
+lora_alpha: 16
+lora_dropout: 0.1
+task_type: "CAUSAL_LM"
+
+### bitsandbytes related
+load_in_4bit: true
+bnb_4bit_use_double_quant: true
+bnb_4bit_quant_type: "nf4"
+bnb_4bit_compute_dtype: "bfloat16"
+bnb_4bit_quant_storage: "bfloat16"
