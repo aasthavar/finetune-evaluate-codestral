@@ -1,13 +1,13 @@
 
 ### training related
-dataset_path: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/data"
+dataset_path: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/data" # prexisting folder path
 output_dir: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/checkpoints" # prexisting folder path
 sm_save_model_dir: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/model/"  # prexisting folder path
-logging_dir: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/checkpoints/logs"
+logging_dir: "/home/ubuntu/finetune-llms-on-aws/practise-fsdp/sft_cache/checkpoints/logs" # prexisting folder path
 
 model_id: "mistral-community/Codestral-22B-v0.1"
 num_train_epochs: 1
-max_steps: -1   # mumber of training steps (overrides num_train_epochs)
+max_steps: -1 # mumber of training steps (overrides num_train_epochs)
 per_device_train_batch_size: 1
 per_device_eval_batch_size: 1
 gradient_accumulation_steps: 1

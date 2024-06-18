@@ -13,8 +13,6 @@ from trl import SFTTrainer
 from trl.commands.cli_utils import  TrlParser
 from peft import LoraConfig, AutoPeftModelForCausalLM
 
-os.environ["ACCELERATE_USE_FSDP"] = "1"
-os.environ["FSDP_CPU_RAM_EFFICIENT_LOADING"] = "1"
 
 @dataclass
 class ScriptArguments:
@@ -42,7 +40,8 @@ class ScriptArguments:
     bnb_4bit_quant_type: str = field(default="nf4")
     bnb_4bit_compute_dtype: str = field(default="bfloat16")
     bnb_4bit_quant_storage: str = field(default="bfloat16")
-    
+
+   
 def find_all_linear_names(model):
     lora_module_names = set()
     for name, module in model.named_modules():
@@ -53,6 +52,7 @@ def find_all_linear_names(model):
     if "lm_head" in lora_module_names:  # needed for 16-bit
         lora_module_names.remove("lm_head")
     return list(lora_module_names)
+
     
 def sft(script_args, training_args):
      # load dataset
@@ -174,7 +174,7 @@ def sft(script_args, training_args):
         
         # 0. save the model at output_dir path
         trainer.model.save_pretrained(training_args.output_dir, safe_serialization=False)
-        
+
         if trainer.accelerator.is_main_process:
             # 1. clear memory
             del model
@@ -199,15 +199,13 @@ def sft(script_args, training_args):
     else:
         trainer.model.save_pretrained(script_args.sm_save_model_dir, safe_serialization=True)
         
-        # save tokenizer for easy inference
-        if trainer.accelerator.is_main_process:
-            if script_args.save_tokenizer:
-                tokenizer = AutoTokenizer.from_pretrained(script_args.model_id, trust_remote_code=True)
-                tokenizer.pad_token = tokenizer.eos_token
-                tokenizer.padding_side = "right"
-                tokenizer.save_pretrained(script_args.sm_save_model_dir)
-                print(f"end: tokenizer saved")
-    
+    # save tokenizer for easy inference
+    if trainer.accelerator.is_main_process:
+        if script_args.save_tokenizer:
+            tokenizer = AutoTokenizer.from_pretrained(script_args.model_id, trust_remote_code=True)
+            tokenizer.pad_token = tokenizer.eos_token
+            tokenizer.padding_side = "right"
+            tokenizer.save_pretrained(script_args.sm_save_model_dir)
 
 
 if __name__ == "__main__":
@@ -217,6 +215,9 @@ if __name__ == "__main__":
     if script_args.finetune_with_sm:
         import sys, subprocess
         subprocess.check_call([sys.executable, "-m", "pip", "install", "flash-attn", "--no-build-isolation"])
+        
+        os.environ["ACCELERATE_USE_FSDP"] = "1"
+        os.environ["FSDP_CPU_RAM_EFFICIENT_LOADING"] = "1"
 
     # launch supervised finetuning
     set_seed(training_args.seed)
